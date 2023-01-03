@@ -2,15 +2,36 @@
 
 local shotFl = gui.add_checkbox("on shot fl0", "lua>tab a")--
 local shotDuck = gui.add_checkbox("on shot duck", "lua>tab a")--
+local jumpScoutOvr = gui.add_checkbox("jump scout hitchance ovr", "lua>tab a")--
+local jumpScoutHc = gui.add_slider("jump scout hitchance", "lua>tab a", 0, 100, 1)
 
 local resetShot = false--
+local resetJump = false--
 local shotTime = 0--
 local originFl = 0--
+local originHc = 0--
 local flSetting = gui.get_config_item("Rage>Anti-Aim>Fakelag>Mode")
 local desyncSetting = gui.get_config_item("Rage>Anti-Aim>Desync>Fake")
 local fdSetting = gui.get_config_item("Misc>Movement>Fake duck")
+local scoutHcSetting = gui.get_config_item("Rage>Aimbot>Ssg08>Scout>Hitchance")
 
-function on_create_move()--
+local function jump_scout()
+    local lPEntity = entities.get_entity(engine.get_local_player())
+    if lPEntity == nil or not jumpScoutOvr:get_bool()then
+        return
+    end
+    if lPEntity:get_prop("m_hGroundEntity") == -1 and not resetJump then
+        originHc = scoutHcSetting:get_int()
+        scoutHcSetting:set_int(jumpScoutHc:get_int())
+        resetJump = true
+    elseif lPEntity:get_prop("m_hGroundEntity")  ~= -1 and resetJump then
+        scoutHcSetting:set_int(originHc)
+        resetJump = false
+    else
+        return
+    end
+end
+local function shot_timer()
     if resetShot and shotTime < global_vars.tickcount then 
         desyncSetting:set_bool(true)
         flSetting:set_int(originFl)--
@@ -24,7 +45,7 @@ function on_create_move()--
         fdSetting:set_bool(true)--anti keybind
     end--
 end
-function on_shot_registered(shot)
+local function on_shot(shot)
     if not (shotFl:get_bool() or shotDuck:get_bool()) then--
         return--
     end--
@@ -47,6 +68,14 @@ function on_shot_registered(shot)
         shotTime = global_vars.tickcount + 14
         return
     end
+end
 
+function on_shot_registered(shot)
+    on_shot(shot)
+end
+
+function on_create_move()--
+    jump_scout()
+    shot_timer()
 end
 
