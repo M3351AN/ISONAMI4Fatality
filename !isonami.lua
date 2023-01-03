@@ -35,13 +35,7 @@ local resetTick = 0--
 local shotTime = 0--
 local originFl = 0--
 local originHc = 0--
-local two = false
-local land = false
-local once = false
 
-
-local time = 10
-local time2 = 2
 --function
 local fpsBoost = gui.add_button("fps boost", "lua>tab a", function() 
     cvar.r_shadows:set_int(0)
