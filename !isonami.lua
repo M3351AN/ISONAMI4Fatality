@@ -13,7 +13,7 @@ local menu_elements = {
     shotDuck = gui.add_checkbox("on shot duck", "Lua>Tab A"),
     jumpScoutOvr = gui.add_checkbox("jump scout hitchance ovr", "Lua>Tab A"),
     jumpScoutHc = gui.add_slider("jump scout hitchance", "Lua>Tab A", 0, 100, 1),
-    breakLagcomp = gui.add_checkbox("break lag comp", "Lua>Tab A")
+    breakLagcomp = gui.add_combo("break lag comp", "Lua>Tab A",{"off", "prefer break", "prefer lag"})
 }
 --cheat self setting
 local cheat_refs = {
@@ -62,10 +62,17 @@ local fpsBoost = gui.add_button("fps boost", "lua>tab a", function()
     print("fps boosted!")
 end)
 local function break_lag()
-    if menu_elements.breakLagcomp:get_bool() and resetTick < global_vars.tickcount and not resetShot then 
-       cheat_refs.flLimitSetting:set_int(utils.random_int(7,14))
-       resetTick = global_vars.tickcount + cheat_refs.flLimitSetting:get_int() * 2
+    if menu_elements.breakLagcomp:get_int() == 0 or resetTick >= global_vars.tickcount or resetShot then 
+        return
     end
+    if menu_elements.breakLagcomp:get_int() == 2 then
+        cheat_refs.flLimitSetting:set_int(utils.random_int(7,14))
+        resetTick = global_vars.tickcount + cheat_refs.flLimitSetting:get_int() * 2
+    else
+        cheat_refs.flLimitSetting:set_int(utils.random_int(1,2))
+        resetTick = global_vars.tickcount + cheat_refs.flLimitSetting:get_int()
+    end
+    
 end
 local function jump_scout()
     local lPEntity = entities.get_entity(engine.get_local_player())
