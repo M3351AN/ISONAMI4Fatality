@@ -2,6 +2,11 @@
 --.description isonami.lua for fatality.win
 --.author m1tZw
 --da, ia ist m1tZw desu!!
+
+--requirement
+--n0n3
+--ffi
+--n0n3
 --lua menu
 local menu_elements = {
     shotFl = gui.add_checkbox("on shot fl0", "Lua>Tab A"),
@@ -19,15 +24,24 @@ local cheat_refs = {
     scoutHcSetting = gui.get_config_item("Rage>Aimbot>Ssg08>Scout>Hitchance"),
     dtSetting = gui.get_config_item("rage>aimbot>aimbot>double tap"),
     antiExplSetting = gui.get_config_item("rage>aimbot>aimbot>anti-exploit"),
+    legMovementSetting = gui.get_config_item("Rage>Anti-Aim>Desync>Leg Slide"),
     peekSetting = gui.get_config_item("Misc>Movement>Peek Assist")
 }
 --init
 local resetShot = false--
 local resetJump = false--
 local resetFl = false--
+local resetTick = 0--
 local shotTime = 0--
 local originFl = 0--
 local originHc = 0--
+local two = false
+local land = false
+local once = false
+
+
+local time = 10
+local time2 = 2
 --function
 local fpsBoost = gui.add_button("fps boost", "lua>tab a", function() 
     cvar.r_shadows:set_int(0)
@@ -54,8 +68,9 @@ local fpsBoost = gui.add_button("fps boost", "lua>tab a", function()
     print("fps boosted!")
 end)
 local function break_lag()
-    if menu_elements.breakLagcomp:get_bool() then 
-       cheat_refs.flLimitSetting:set_int(utils.random_int(1, 2))
+    if menu_elements.breakLagcomp:get_bool() and resetTick < global_vars.tickcount and not resetShot then 
+       cheat_refs.flLimitSetting:set_int(utils.random_int(7,14))
+       resetTick = global_vars.tickcount + cheat_refs.flLimitSetting:get_int() * 2
     end
 end
 local function jump_scout()
@@ -117,7 +132,7 @@ end
 function on_shot_registered(shot)
     on_shot(shot)
 end
-function on_create_move()--
+function on_create_move(cmd)--
     break_lag()
     jump_scout()
     shot_timer()
