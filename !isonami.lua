@@ -13,7 +13,7 @@ local menu_elements = {
     shotDuck = gui.add_checkbox("on shot duck", "Lua>Tab A"),
     jumpScoutOvr = gui.add_checkbox("jump scout hitchance ovr", "Lua>Tab A"),
     jumpScoutHc = gui.add_slider("jump scout hitchance", "Lua>Tab A", 0, 100, 1),
-    breakLagcomp = gui.add_combo("break lag comp", "Lua>Tab A",{"off", "prefer break", "prefer lag"})
+    breakLagcomp = gui.add_combo("break lag comp", "Lua>Tab A",{"off", "prefer break", "prefer lag","prefer random","prefer mm"})
 }
 --cheat self setting
 local cheat_refs = {
@@ -35,6 +35,8 @@ local resetTick = 0--
 local shotTime = 0--
 local originFl = 0--
 local originHc = 0--
+local flA = 4
+local flB = 7
 
 --function
 local fpsBoost = gui.add_button("fps boost", "lua>tab a", function() 
@@ -65,12 +67,21 @@ local function break_lag()
     if menu_elements.breakLagcomp:get_int() == 0 or resetTick >= global_vars.tickcount or resetShot then 
         return
     end
-    if menu_elements.breakLagcomp:get_int() == 2 then
+    if menu_elements.breakLagcomp:get_int() == 1 then
+        cheat_refs.flLimitSetting:set_int(utils.random_int(1,2))
+        resetTick = global_vars.tickcount + cheat_refs.flLimitSetting:get_int() * 2
+    elseif menu_elements.breakLagcomp:get_int() == 2 then
         cheat_refs.flLimitSetting:set_int(utils.random_int(7,14))
         resetTick = global_vars.tickcount + cheat_refs.flLimitSetting:get_int() * 2
-    else
-        cheat_refs.flLimitSetting:set_int(utils.random_int(1,2))
-        resetTick = global_vars.tickcount + cheat_refs.flLimitSetting:get_int()
+    elseif menu_elements.breakLagcomp:get_int() == 3 then
+        cheat_refs.flLimitSetting:set_int(utils.random_int(1,14))
+        resetTick = global_vars.tickcount + cheat_refs.flLimitSetting:get_int() * 2
+        elseif menu_elements.breakLagcomp:get_int() == 4 then
+        flA = flB + flA
+        flB = flA - flB
+        flA = flA - flB
+        cheat_refs.flLimitSetting:set_int(flA)
+        resetTick = global_vars.tickcount + cheat_refs.flLimitSetting:get_int() * 2
     end
     
 end
